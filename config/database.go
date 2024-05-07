@@ -6,12 +6,13 @@ import (
 )
 
 type DatabaseConf struct {
-	Host           string
-	Port           string
-	Database       string
-	DeviceDatabase string
-	Username       string
-	Password       string
+	Host            string
+	Port            string
+	Database        string
+	DeviceDatabase  string
+	Username        string
+	Password        string
+	MigrateSelfOnly bool
 }
 
 var databaseConfigInstance *DatabaseConf
@@ -43,13 +44,18 @@ func GetDatabaseConfig() *DatabaseConf {
 		if os.Getenv("DB_PASSWORD") != "" {
 			password = os.Getenv("DB_PASSWORD")
 		}
+		migrateSelfOnly := false
+		if os.Getenv("DB_MIGRATE_SELF_ONLY") == "true" {
+			migrateSelfOnly = true
+		}
 		databaseConfigInstance = &DatabaseConf{
-			Host:           host,
-			Port:           port,
-			Database:       database,
-			DeviceDatabase: deviceDatabase,
-			Username:       username,
-			Password:       password,
+			Host:            host,
+			Port:            port,
+			Database:        database,
+			DeviceDatabase:  deviceDatabase,
+			Username:        username,
+			Password:        password,
+			MigrateSelfOnly: migrateSelfOnly,
 		}
 	})
 	return databaseConfigInstance
