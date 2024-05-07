@@ -27,6 +27,7 @@ func GetOrm() *Orm {
 			conf.Logger = logger.Default.LogMode(logger.Info)
 		}
 		conf.DisableForeignKeyConstraintWhenMigrating = dbConf.MigrateSelfOnly
+		conf.IgnoreRelationshipsWhenMigrating = dbConf.MigrateSelfOnly
 		db, err := gorm.Open(mysql.Open(dsn), conf)
 		if err != nil {
 			panic("failed to connect database")
