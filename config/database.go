@@ -1,0 +1,56 @@
+package config
+
+import (
+	"os"
+	"sync"
+)
+
+type DatabaseConf struct {
+	Host           string
+	Port           string
+	Database       string
+	DeviceDatabase string
+	Username       string
+	Password       string
+}
+
+var databaseConfigInstance *DatabaseConf
+var databaseConfigOnce sync.Once
+
+func GetDatabaseConfig() *DatabaseConf {
+	databaseConfigOnce.Do(func() {
+		host := "127.0.0.1"
+		if os.Getenv("DB_HOST") != "" {
+			host = os.Getenv("DB_HOST")
+		}
+		port := "3306"
+		if os.Getenv("DB_PORT") != "" {
+			port = os.Getenv("DB_PORT")
+		}
+		database := "test"
+		if os.Getenv("DB_DATABASE") != "" {
+			database = os.Getenv("DB_DATABASE")
+		}
+		deviceDatabase := "norma_device"
+		if os.Getenv("DB_DATABASE_DEVICE") != "" {
+			deviceDatabase = os.Getenv("DB_DATABASE_DEVICE")
+		}
+		username := "root"
+		if os.Getenv("DB_USERNAME") != "" {
+			username = os.Getenv("DB_USERNAME")
+		}
+		password := "password"
+		if os.Getenv("DB_PASSWORD") != "" {
+			password = os.Getenv("DB_PASSWORD")
+		}
+		databaseConfigInstance = &DatabaseConf{
+			Host:           host,
+			Port:           port,
+			Database:       database,
+			DeviceDatabase: deviceDatabase,
+			Username:       username,
+			Password:       password,
+		}
+	})
+	return databaseConfigInstance
+}
