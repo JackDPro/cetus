@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"cetus/model"
-	"cetus/provider"
+	"github.com/JackDPro/cetus/model"
+	"github.com/JackDPro/cetus/provider"
 	"github.com/gin-gonic/gin"
 	"github.com/go-kit/log/level"
 	"net/http"

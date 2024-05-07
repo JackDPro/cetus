@@ -1,8 +1,8 @@
 package provider
 
 import (
-	"cetus/config"
 	"fmt"
+	"github.com/JackDPro/cetus/config"
 	kitLog "github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"log"

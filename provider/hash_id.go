@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"cetus/config"
+	"github.com/JackDPro/cetus/config"
 	"github.com/pjebs/optimus-go"
 )
 

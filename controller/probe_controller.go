@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"cetus/config"
-	"cetus/model"
 	"errors"
+	"github.com/JackDPro/cetus/config"
+	"github.com/JackDPro/cetus/model"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )

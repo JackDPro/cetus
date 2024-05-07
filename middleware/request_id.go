@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"bytes"
-	"cetus/provider"
+	"github.com/JackDPro/cetus/provider"
 	"github.com/gin-gonic/gin"
 	"github.com/go-kit/log/level"
 	"github.com/google/uuid"

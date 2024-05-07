@@ -1,4 +1,4 @@
-module cetus
+module github.com/JackDPro/cetus
 
 go 1.22
 

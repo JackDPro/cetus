@@ -1,8 +1,8 @@
 package provider
 
 import (
-	"cetus/config"
 	"fmt"
+	"github.com/JackDPro/cetus/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"sync"
