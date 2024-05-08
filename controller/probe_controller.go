@@ -9,6 +9,7 @@ import (
 )
 
 type ProbeController struct {
+	Controller
 }
 
 func NewProbeController() *ProbeController {
@@ -29,10 +30,10 @@ func (ctr *ProbeController) Show(c *gin.Context) {
 	}
 	switch status {
 	case 400:
-		ResponseBadRequest(c, 1, "request bad test")
+		ctr.ResponseBadRequest(c, 1, "request bad test")
 	case 500:
-		ResponseInternalError(c, 1, "request internal error test", errors.New("internal error"))
+		ctr.ResponseInternalError(c, 1, "request internal error test", errors.New("internal error"))
 	default:
-		ResponseItem(c, &probe)
+		ctr.ResponseItem(c, &probe)
 	}
 }

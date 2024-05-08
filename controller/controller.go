@@ -10,31 +10,34 @@ import (
 	"strconv"
 )
 
-func ResponseUnauthorized(c *gin.Context) {
+type Controller struct {
+}
+
+func (ctr *Controller) ResponseUnauthorized(c *gin.Context) {
 	c.AbortWithStatusJSON(http.StatusUnauthorized, &map[string]string{
 		"message": "unauthorized",
 	})
 }
-func ResponseForbidden(c *gin.Context) {
+func (ctr *Controller) ResponseForbidden(c *gin.Context) {
 	c.AbortWithStatusJSON(http.StatusForbidden, &map[string]string{
 		"message": "forbidden",
 	})
 }
 
-func ResponseAccepted(c *gin.Context) {
+func (ctr *Controller) ResponseAccepted(c *gin.Context) {
 	c.JSON(http.StatusAccepted, &model.Success{Code: 0})
 }
-func ResponseSuccess(c *gin.Context) {
+func (ctr *Controller) ResponseSuccess(c *gin.Context) {
 	c.JSON(http.StatusOK, &model.Success{Code: 0})
 }
-func ResponseCreated(c *gin.Context, id uint64) {
+func (ctr *Controller) ResponseCreated(c *gin.Context, id uint64) {
 	c.Writer.Header().Set("Location", strconv.FormatUint(id, 10))
 	c.JSON(http.StatusCreated, map[string]uint64{
 		"id": id,
 	})
 }
 
-func ResponseError(c *gin.Context, status int, code int, message string, err error) {
+func (ctr *Controller) ResponseError(c *gin.Context, status int, code int, message string, err error) {
 	detail := ""
 	if err != nil {
 		detail = err.Error()
@@ -46,27 +49,27 @@ func ResponseError(c *gin.Context, status int, code int, message string, err err
 	})
 }
 
-func ResponseInternalError(c *gin.Context, code int, message string, err error) {
+func (ctr *Controller) ResponseInternalError(c *gin.Context, code int, message string, err error) {
 	_ = level.Error(provider.GetLogger()).Log(err)
-	ResponseError(c, http.StatusInternalServerError, code, message, nil)
+	ctr.ResponseError(c, http.StatusInternalServerError, code, message, nil)
 }
 
-func ResponseUnprocessable(c *gin.Context, code int, message string, err error) {
-	ResponseError(c, http.StatusUnprocessableEntity, code, message, err)
+func (ctr *Controller) ResponseUnprocessable(c *gin.Context, code int, message string, err error) {
+	ctr.ResponseError(c, http.StatusUnprocessableEntity, code, message, err)
 }
 
-func ResponseBadRequest(c *gin.Context, code int, message string) {
-	ResponseError(c, http.StatusBadRequest, code, message, nil)
+func (ctr *Controller) ResponseBadRequest(c *gin.Context, code int, message string) {
+	ctr.ResponseError(c, http.StatusBadRequest, code, message, nil)
 }
 
-func ResponseNotFound(c *gin.Context, message string) {
-	ResponseError(c, http.StatusNotFound, 1, message, nil)
+func (ctr *Controller) ResponseNotFound(c *gin.Context, message string) {
+	ctr.ResponseError(c, http.StatusNotFound, 1, message, nil)
 }
 
-func ResponseItem(c *gin.Context, item model.IModel) {
+func (ctr *Controller) ResponseItem(c *gin.Context, item model.IModel) {
 	data, err := item.ToMap()
 	if err != nil {
-		ResponseInternalError(c, 9827, "convert data failed", err)
+		ctr.ResponseInternalError(c, 9827, "convert data failed", err)
 		return
 	}
 	c.JSON(http.StatusOK, &model.DataWrapper{
@@ -74,7 +77,7 @@ func ResponseItem(c *gin.Context, item model.IModel) {
 		Meta: nil,
 	})
 }
-func ResponseCollection[T any](c *gin.Context, items []T, meta *model.Meta) {
+func (ctr *Controller) ResponseCollection(c *gin.Context, items []interface{}, meta *model.Meta) {
 	data := make([]interface{}, len(items))
 	var err error
 	for index, item := range items {
