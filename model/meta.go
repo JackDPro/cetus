@@ -1,13 +1,10 @@
 package model
 
-import "fmt"
-
 type Meta struct {
 	Pagination *Pagination `json:"pagination"`
 }
 
 func (p *Meta) IsNull() bool {
-	fmt.Print(p.Pagination)
 	if p.Pagination != nil {
 		return false
 	}
