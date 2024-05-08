@@ -9,7 +9,6 @@ import (
 )
 
 type ProbeController struct {
-	Controller
 }
 
 func NewProbeController() *ProbeController {
@@ -29,7 +28,7 @@ func (ctr *ProbeController) Index(c *gin.Context) {
 		ConfigPath: conf.ConfigPath,
 	}
 	items := []model.Probe{probe1, probe2}
-	ctr.ResponseCollection(c, items, nil)
+	ResponseCollection(c, items, nil)
 }
 
 func (ctr *ProbeController) Show(c *gin.Context) {
@@ -46,10 +45,10 @@ func (ctr *ProbeController) Show(c *gin.Context) {
 	}
 	switch status {
 	case 400:
-		ctr.ResponseBadRequest(c, 1, "request bad test")
+		ResponseBadRequest(c, 1, "request bad test")
 	case 500:
-		ctr.ResponseInternalError(c, 1, "request internal error test", errors.New("internal error"))
+		ResponseInternalError(c, 1, "request internal error test", errors.New("internal error"))
 	default:
-		ctr.ResponseItem(c, &probe)
+		ResponseItem(c, &probe)
 	}
 }
