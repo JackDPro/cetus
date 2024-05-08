@@ -77,12 +77,19 @@ func (ctr *Controller) ResponseItem(c *gin.Context, item model.IModel) {
 		Meta: nil,
 	})
 }
-func (ctr *Controller) ResponseCollection(c *gin.Context, items []interface{}, meta *model.Meta) {
-	data := make([]interface{}, len(items))
+
+func (ctr *Controller) ResponseCollection(c *gin.Context, items interface{}, meta *model.Meta) {
+	if reflect.TypeOf(items).Kind() != reflect.Slice {
+		return
+	}
+	itemArray := reflect.ValueOf(items)
+	data := make([]interface{}, itemArray.Len())
 	var err error
-	for index, item := range items {
+
+	for i := 0; i < itemArray.Len(); i++ {
+		item := itemArray.Index(i)
 		mod := reflect.ValueOf(&item).Interface().(model.IModel)
-		data[index], err = mod.ToMap()
+		data[i], err = mod.ToMap()
 		if err != nil {
 			_ = level.Error(provider.GetLogger()).Log("message", "model to map failed", "error", err)
 			continue

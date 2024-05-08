@@ -16,6 +16,22 @@ func NewProbeController() *ProbeController {
 	return &ProbeController{}
 }
 
+func (ctr *ProbeController) Index(c *gin.Context) {
+	conf := config.GetAppConfig()
+	probe1 := model.Probe{
+		AppName:    conf.Name,
+		AppVersion: conf.Version,
+		ConfigPath: conf.ConfigPath,
+	}
+	probe2 := model.Probe{
+		AppName:    conf.Name,
+		AppVersion: conf.Version,
+		ConfigPath: conf.ConfigPath,
+	}
+	items := []model.Probe{probe1, probe2}
+	ctr.ResponseCollection(c, items, nil)
+}
+
 func (ctr *ProbeController) Show(c *gin.Context) {
 	statusStr := c.Request.URL.Query().Get("status")
 	status := 200
