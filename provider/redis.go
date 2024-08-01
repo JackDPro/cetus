@@ -2,7 +2,7 @@ package provider
 
 import (
 	"github.com/JackDPro/cetus/config"
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 	"sync"
 )
 
@@ -13,17 +13,14 @@ func GetRedisClient() *redis.Client {
 	redisOnce.Do(func() {
 		conf := config.GetRedisConfig()
 		redisInstance = redis.NewClient(&redis.Options{
-			Addr:               conf.Host + ":" + conf.Port,
-			Password:           conf.Password,
-			DB:                 conf.DB,
-			PoolSize:           conf.PoolSize,
-			MinIdleConns:       0,
-			MaxConnAge:         0,
-			PoolTimeout:        0,
-			IdleTimeout:        0,
-			IdleCheckFrequency: 0,
-			TLSConfig:          nil,
-			Limiter:            nil,
+			Addr:         conf.Host + ":" + conf.Port,
+			Password:     conf.Password,
+			DB:           conf.DB,
+			PoolSize:     conf.PoolSize,
+			MinIdleConns: 0,
+			PoolTimeout:  0,
+			TLSConfig:    nil,
+			Limiter:      nil,
 		})
 	})
 	return redisInstance
