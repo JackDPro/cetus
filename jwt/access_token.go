@@ -1,7 +1,9 @@
-package model
+package jwt
+
+import "github.com/JackDPro/cetus/model"
 
 type AccessToken struct {
-	BaseModel
+	model.BaseModel
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 	Type         string `json:"type"`
