@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"github.com/JackDPro/cetus/config"
 	"github.com/JackDPro/cetus/provider"
-	"github.com/go-kit/log/level"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/redis/go-redis/v9"
 	"os"
@@ -27,30 +26,32 @@ type Guard struct {
 
 var guardInstance *Guard
 var guardOnce sync.Once
+var createError error
 
-func GetJwtGuard() *Guard {
+func GetJwtGuard() (*Guard, error) {
+	createError = nil
 	guardOnce.Do(func() {
 		var conf = config.GetAuthConf()
 
 		keyBuffer, err := os.ReadFile(conf.KeyPath)
 		if err != nil {
-			_ = level.Error(provider.GetLogger()).Log("id", "jwt", "method", "GetJwtGuard", "message", "load private key content failed", "error", err)
+			createError = fmt.Errorf("load private key content failed %s", err)
 			return
 		}
 		privateKey, err := x509.ParsePKCS8PrivateKey(keyBuffer)
 		if err != nil {
-			_ = level.Error(provider.GetLogger()).Log("id", "jwt", "method", "GetJwtGuard", "message", "parse private key failed", "error", err)
+			createError = fmt.Errorf("parse private key content failed %s", err)
 			return
 		}
 		publicKeyByte, err := os.ReadFile(conf.CertPath)
 		if err != nil {
-			_ = level.Error(provider.GetLogger()).Log("id", "jwt", "method", "GetJwtGuard", "message", "load public key failed", "error", err)
+			createError = fmt.Errorf("load public key content failed %s", err)
 			return
 		}
 		publicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKeyByte)
 		rsaPrivateKey, ok := privateKey.(*rsa.PrivateKey)
 		if !ok {
-			_ = level.Error(provider.GetLogger()).Log("id", "jwt", "method", "GetJwtGuard", "message", "parse public key failed", "error", err)
+			createError = fmt.Errorf("parse public key content failed %s", err)
 			return
 		}
 		guardInstance = &Guard{
@@ -61,7 +62,13 @@ func GetJwtGuard() *Guard {
 			redis:      provider.GetRedisClient(),
 		}
 	})
-	return guardInstance
+	if createError != nil {
+		return nil, createError
+	}
+	if guardInstance == nil {
+		return nil, fmt.Errorf("create instance failed")
+	}
+	return guardInstance, nil
 }
 
 func (guard *Guard) CreateAccessToken(userId uint64) (*AccessToken, error) {
