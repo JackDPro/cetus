@@ -81,7 +81,7 @@ func (guard *Guard) CreateAccessToken(userId uint64) (*AccessToken, error) {
 		UserId:    userId,
 		Token:     provider.RandomString(32),
 		Type:      "access_key",
-		ExpiredAt: now.Add(time.Duration(conf.ExpiresIn) * time.Hour),
+		ExpiredAt: now.Add(time.Duration((time.Duration(conf.ExpiresIn) * time.Hour).Seconds())),
 		Now:       now,
 		Audience:  conf.Audience,
 	}
@@ -127,7 +127,7 @@ func (guard *Guard) CreateToken(userId uint64, clean bool) (*AccessToken, error)
 		UserId:    userId,
 		Token:     provider.RandomString(32),
 		Type:      "token",
-		ExpiredAt: now.Add(time.Duration(conf.ExpiresIn) * time.Hour),
+		ExpiredAt: now.Add(time.Duration((time.Duration(conf.ExpiresIn) * time.Hour).Seconds())),
 		Now:       now,
 		Audience:  conf.Audience,
 	}
@@ -162,7 +162,7 @@ func (guard *Guard) CreateToken(userId uint64, clean bool) (*AccessToken, error)
 		UserId:    userId,
 		Token:     provider.RandomString(32),
 		Type:      "refresh",
-		ExpiredAt: now.Add(time.Duration(conf.ExpiresIn) * 3 * time.Hour),
+		ExpiredAt: now.Add(time.Duration((time.Duration(conf.ExpiresIn) * time.Hour).Seconds())),
 		Now:       now,
 		Audience:  conf.Audience,
 	}
