@@ -93,3 +93,9 @@ func ResponseCollection[T any](c *gin.Context, items []T, meta *model.Meta) {
 	}
 	c.JSON(http.StatusOK, jsonData)
 }
+
+func ResponseIntArray(c *gin.Context, items []int) {
+	c.JSON(http.StatusOK, &model.DataWrapper{
+		Data: items,
+	})
+}
