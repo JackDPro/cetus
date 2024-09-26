@@ -76,14 +76,14 @@ func ResponseItem(c *gin.Context, item model.IModel) {
 }
 func ResponseCollection[T any](c *gin.Context, items []T, meta *model.Meta) {
 	data := make([]interface{}, len(items))
-	var err error
-	//TODO 这里错误来
+	//TODO 这里错误了
 	for index, item := range items {
 		mod := reflect.ValueOf(&item).Interface().(model.IModel)
-		data[index], err = mod.ToMap()
+		mapVal, err := mod.ToMap()
 		if err != nil {
 			continue
 		}
+		data[index] = mapVal
 	}
 	jsonData := &model.DataWrapper{
 		Data: data,
