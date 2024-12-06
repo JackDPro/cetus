@@ -2,17 +2,13 @@ package model
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"gorm.io/gorm"
 	"reflect"
 	"strings"
 )
 
 type BaseModel struct{}
-
-func (b *BaseModel) Fields() []string {
-	return []string{}
-}
 
 func (b *BaseModel) ToJson(model interface{}) (string, error) {
 	modelMap, err := b.ToMap(model)
@@ -28,34 +24,21 @@ func (b *BaseModel) ToJson(model interface{}) (string, error) {
 
 func (b *BaseModel) ToMap(model interface{}) (map[string]interface{}, error) {
 	modelMap := make(map[string]interface{})
-	modelVal := reflect.ValueOf(model)
-	modelType := reflect.TypeOf(model).Elem()
-
-	fieldsMethod := modelVal.MethodByName("Fields")
-	if fieldsMethod.IsValid() {
-		result := fieldsMethod.Call([]reflect.Value{})
-		if len(result) > 0 {
-			fields := result[0]
-			for i := 0; i < fields.Len(); i++ {
-				fieldName := fields.Index(i).String()
-				key := fieldName
-				field, ok := modelType.FieldByName(fieldName)
-				if ok {
-					jsonTag := field.Tag.Get("json")
-					if jsonTag != "" {
-						key = jsonTag
-					}
-				}
-				fieldValue := modelVal.Elem().FieldByName(fieldName)
-				if fieldValue.IsValid() && fieldValue.CanInterface() {
-					modelMap[key] = fieldValue.Interface()
-				}
-			}
-		}
-	} else {
-		return nil, errors.New("model need Fields method")
+	val := reflect.ValueOf(model)
+	if val.Kind() == reflect.Ptr {
+		val = val.Elem()
 	}
-
+	if val.Kind() != reflect.Struct {
+		return nil, fmt.Errorf("expected a struct or pointer to struct")
+	}
+	typ := val.Type()
+	for i := 0; i < val.NumField(); i++ {
+		field := typ.Field(i)
+		tag := field.Tag.Get("json")
+		if tag != "" {
+			modelMap[tag] = val.Field(i).Interface()
+		}
+	}
 	return modelMap, nil
 }
 
