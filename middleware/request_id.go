@@ -2,9 +2,7 @@ package middleware
 
 import (
 	"bytes"
-	"github.com/JackDPro/cetus/provider"
 	"github.com/gin-gonic/gin"
-	"github.com/go-kit/log/level"
 	"github.com/google/uuid"
 )
 
@@ -31,14 +29,5 @@ func RequestId() gin.HandlerFunc {
 		}
 		c.Set("request_id", requestId)
 		c.Next()
-
-		switch status := c.Writer.Status(); {
-		case status < 400:
-			_ = level.Info(provider.GetLogger()).Log("message", "success", "request_id", requestId)
-		case 400 <= status && status < 500:
-			_ = level.Warn(provider.GetLogger()).Log("path", c.Request.URL.String(), "params", c.Request.URL.Query(), "payload", c.Request.PostForm, "request_id", requestId)
-		case 500 <= status:
-			_ = level.Error(provider.GetLogger()).Log("path", c.Request.URL.String(), "params", c.Request.URL.Query(), "payload", c.Request.PostForm, "response", writer.body.String(), "request_id", requestId)
-		}
 	}
 }

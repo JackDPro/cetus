@@ -10,24 +10,35 @@ import (
 	"strconv"
 )
 
+func AddRequestId(c *gin.Context) {
+	requestId, _ := c.Get("request_id")
+	c.Writer.Header().Add("X-Request-Id", requestId.(string))
+	c.Writer.Header().Add("foo", "hello jack")
+}
+
 func ResponseUnauthorized(c *gin.Context) {
+	AddRequestId(c)
 	c.AbortWithStatusJSON(http.StatusUnauthorized, &map[string]string{
 		"message": "unauthorized",
 	})
 }
 func ResponseForbidden(c *gin.Context) {
+	AddRequestId(c)
 	c.AbortWithStatusJSON(http.StatusForbidden, &map[string]string{
 		"message": "forbidden",
 	})
 }
 
 func ResponseAccepted(c *gin.Context) {
+	AddRequestId(c)
 	c.JSON(http.StatusAccepted, &model.Success{Code: 0})
 }
 func ResponseSuccess(c *gin.Context) {
+	AddRequestId(c)
 	c.JSON(http.StatusOK, &model.Success{Code: 0})
 }
 func ResponseCreated(c *gin.Context, id uint64) {
+	AddRequestId(c)
 	c.Writer.Header().Set("Location", strconv.FormatUint(id, 10))
 	c.JSON(http.StatusCreated, map[string]uint64{
 		"id": id,
@@ -35,6 +46,7 @@ func ResponseCreated(c *gin.Context, id uint64) {
 }
 
 func ResponseError(c *gin.Context, status int, code int, message string, err error) {
+	AddRequestId(c)
 	detail := ""
 	if err != nil {
 		detail = err.Error()
@@ -64,6 +76,7 @@ func ResponseNotFound(c *gin.Context, message string) {
 }
 
 func ResponseItem(c *gin.Context, item model.IModel) {
+	AddRequestId(c)
 	data, err := item.ToMap()
 	if err != nil {
 		ResponseInternalError(c, 9827, "convert data failed", err)
@@ -75,6 +88,7 @@ func ResponseItem(c *gin.Context, item model.IModel) {
 	})
 }
 func ResponseCollection[T any](c *gin.Context, items []T, meta *model.Meta) {
+	AddRequestId(c)
 	data := make([]interface{}, len(items))
 	//TODO 这里错误了
 	for index, item := range items {
@@ -95,6 +109,7 @@ func ResponseCollection[T any](c *gin.Context, items []T, meta *model.Meta) {
 }
 
 func ResponseIntArray(c *gin.Context, items []int) {
+	AddRequestId(c)
 	c.JSON(http.StatusOK, &model.DataWrapper{
 		Data: items,
 	})
