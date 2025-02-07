@@ -28,6 +28,7 @@ func RequestId() gin.HandlerFunc {
 			requestId = uuid.New().String()
 		}
 		c.Set("request_id", requestId)
+		c.Writer.Header().Add("Request-Id", requestId)
 		c.Next()
 	}
 }
