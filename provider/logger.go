@@ -1,50 +1,64 @@
 package provider
 
 import (
-	"fmt"
 	"github.com/JackDPro/cetus/config"
-	kitLog "github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
-	"log"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"io"
 	"os"
 	"sync"
 )
 
-var loggerInstance kitLog.Logger
+var loggerInstance *zap.SugaredLogger
 var loggerOnce sync.Once
 
-func GetLogger() kitLog.Logger {
+func GetLogger() *zap.SugaredLogger {
 	loggerOnce.Do(func() {
-		conf := config.GetAppConfig()
-		writer := os.Stderr
-		var err error
-		if conf.LogDriver == "file" && conf.DataRoot != "" {
-			filePath := fmt.Sprintf("%s/logs/api.log", conf.DataRoot)
-			writer, err = os.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0644)
+		logConf := config.GetLogConfig()
+		appConf := config.GetAppConfig()
+		cfg := zap.NewProductionEncoderConfig()
+		cfg.EncodeTime = zapcore.ISO8601TimeEncoder
+		cfg.EncodeLevel = zapcore.CapitalLevelEncoder
+
+		// 添加输出通道
+		var writer io.Writer
+		if logConf.FileOut {
+			file, err := os.OpenFile(logConf.FilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 			if err != nil {
-				log.Println("open log file failed", err)
-				writer = os.Stderr
+				panic(err)
 			}
+			if logConf.ConsoleOut {
+				writer = io.MultiWriter(file, os.Stdout)
+			} else {
+				writer = io.MultiWriter(file)
+			}
+		} else {
+			writer = io.MultiWriter(os.Stdout)
 		}
-		loggerInstance = kitLog.NewLogfmtLogger(writer)
-		if conf.LogFormat == "json" {
-			loggerInstance = kitLog.NewJSONLogger(writer)
+		writeSyncer := zapcore.AddSync(writer)
+
+		// 修改输出格式
+		encoder := zapcore.NewConsoleEncoder(cfg)
+		if logConf.Format == "json" {
+			encoder = zapcore.NewJSONEncoder(cfg)
 		}
-		option := level.AllowAll()
-		switch conf.LogLevel {
+
+		var level zapcore.Level
+		switch logConf.Level {
 		case "debug":
-			option = level.AllowDebug()
+			level = zap.DebugLevel
 		case "info":
-			option = level.AllowInfo()
-		case "warning":
-			option = level.AllowWarn()
+			level = zap.InfoLevel
+		case "warn":
+			level = zap.WarnLevel
 		case "error":
-			option = level.AllowError()
-		case "none":
-			option = level.AllowNone()
+			level = zap.ErrorLevel
 		}
-		loggerInstance = level.NewFilter(loggerInstance, option)
-		loggerInstance = kitLog.With(loggerInstance, "ts", kitLog.DefaultTimestamp, "line", kitLog.DefaultCaller)
+		core := zapcore.NewCore(encoder, writeSyncer, level)
+
+		// 添加统一字段
+		zapLogger := zap.New(core).With(zap.String("app", appConf.Name), zap.String("env", appConf.Env))
+		loggerInstance = zapLogger.Sugar()
 	})
 	return loggerInstance
 }

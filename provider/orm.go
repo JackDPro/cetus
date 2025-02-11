@@ -23,7 +23,7 @@ func GetOrm() *Orm {
 			"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 			dbConf.Username, dbConf.Password, dbConf.Host, dbConf.Port, dbConf.Database)
 		conf := &gorm.Config{}
-		if config.GetAppConfig().Debug {
+		if config.GetAppConfig().Env == "dev" {
 			conf.Logger = logger.Default.LogMode(logger.Info)
 		}
 		conf.DisableForeignKeyConstraintWhenMigrating = dbConf.MigrateSelfOnly

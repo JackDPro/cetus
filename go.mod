@@ -5,7 +5,6 @@ go 1.23
 require (
 	github.com/didip/tollbooth/v7 v7.0.2
 	github.com/gin-gonic/gin v1.10.0
-	github.com/go-kit/kit v0.13.0
 	github.com/go-kit/log v0.2.1
 	github.com/gogf/gf/v2 v2.8.3
 	github.com/golang-jwt/jwt/v5 v5.2.1
@@ -13,7 +12,8 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/pjebs/optimus-go v1.0.0
 	github.com/redis/go-redis/v9 v9.7.0
-	golang.org/x/crypto v0.32.0
+	go.uber.org/zap v1.27.0
+	golang.org/x/crypto v0.33.0
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gorm v1.25.12
 )
@@ -57,8 +57,9 @@ require (
 	go.opentelemetry.io/otel/metric v1.34.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.34.0 // indirect
 	go.opentelemetry.io/otel/trace v1.34.0 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.14.0 // indirect
-	golang.org/x/net v0.34.0 // indirect
+	golang.org/x/net v0.35.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
