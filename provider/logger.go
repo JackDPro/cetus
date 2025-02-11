@@ -57,7 +57,7 @@ func GetLogger() *zap.SugaredLogger {
 		core := zapcore.NewCore(encoder, writeSyncer, level)
 
 		// 添加统一字段
-		zapLogger := zap.New(core).With(zap.String("app", appConf.Name), zap.String("env", appConf.Env))
+		zapLogger := zap.New(core, zap.AddCaller()).With(zap.String("app", appConf.Name), zap.String("env", appConf.Env))
 		loggerInstance = zapLogger.Sugar()
 	})
 	return loggerInstance
