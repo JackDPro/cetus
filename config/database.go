@@ -32,10 +32,6 @@ func GetDatabaseConfig() *DatabaseConf {
 		if os.Getenv("DB_DATABASE") != "" {
 			database = os.Getenv("DB_DATABASE")
 		}
-		deviceDatabase := "norma_device"
-		if os.Getenv("DB_DATABASE_DEVICE") != "" {
-			deviceDatabase = os.Getenv("DB_DATABASE_DEVICE")
-		}
 		username := "root"
 		if os.Getenv("DB_USERNAME") != "" {
 			username = os.Getenv("DB_USERNAME")
@@ -52,7 +48,6 @@ func GetDatabaseConfig() *DatabaseConf {
 			Host:            host,
 			Port:            port,
 			Database:        database,
-			DeviceDatabase:  deviceDatabase,
 			Username:        username,
 			Password:        password,
 			MigrateSelfOnly: migrateSelfOnly,

@@ -25,7 +25,7 @@ func GetRedisConfig() *Redis {
 		if os.Getenv("REDIS_HOST") != "" {
 			host = os.Getenv("REDIS_HOST")
 		}
-		port := "3306"
+		port := "6379"
 		if os.Getenv("REDIS_PORT") != "" {
 			port = os.Getenv("REDIS_PORT")
 		}
