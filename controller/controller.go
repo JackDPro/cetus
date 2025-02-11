@@ -4,7 +4,6 @@ import (
 	"github.com/JackDPro/cetus/model"
 	"github.com/JackDPro/cetus/provider"
 	"github.com/gin-gonic/gin"
-	"github.com/go-kit/log/level"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -47,7 +46,7 @@ func ResponseError(c *gin.Context, status int, code int, message string, err err
 }
 
 func ResponseInternalError(c *gin.Context, code int, message string, err error) {
-	_ = level.Error(provider.GetLogger()).Log(err)
+	provider.GetLogger().Error(err)
 	ResponseError(c, http.StatusInternalServerError, code, message, nil)
 }
 
