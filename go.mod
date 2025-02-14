@@ -4,6 +4,7 @@ go 1.23
 
 require (
 	github.com/didip/tollbooth/v7 v7.0.2
+	github.com/gin-contrib/cors v1.7.3
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-kit/log v0.2.1
 	github.com/gogf/gf/v2 v2.8.3
