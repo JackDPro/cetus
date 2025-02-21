@@ -47,7 +47,7 @@ func ResponseError(c *gin.Context, status int, code int, message string, err err
 
 func ResponseInternalError(c *gin.Context, code int, message string, err error) {
 	provider.GetLogger().Error(err)
-	ResponseError(c, http.StatusInternalServerError, code, message, nil)
+	ResponseError(c, http.StatusInternalServerError, code, message, err)
 }
 
 func ResponseUnprocessable(c *gin.Context, code int, message string, err error) {
@@ -75,7 +75,7 @@ func ResponseItem(c *gin.Context, item model.IModel) {
 }
 func ResponseCollection[T any](c *gin.Context, items []T, meta *model.Meta) {
 	data := make([]interface{}, len(items))
-	//TODO 这里错误了
+	//TODO some bugs here
 	for index, item := range items {
 		mod := reflect.ValueOf(&item).Interface().(model.IModel)
 		mapVal, err := mod.ToMap()
