@@ -6,7 +6,7 @@ import (
 
 type DataWrapper struct {
 	Data interface{} `json:"data"`
-	Meta *Meta       `json:"meta"`
+	Meta *Meta       `json:"meta,omitempty"`
 }
 
 func (data *DataWrapper) ToString() ([]byte, error) {
