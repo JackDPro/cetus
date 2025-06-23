@@ -8,7 +8,9 @@ import (
 	"strings"
 )
 
-type BaseModel struct{}
+type BaseModel struct {
+	gorm.Model
+}
 
 func (b *BaseModel) ToJson(model interface{}) (string, error) {
 	modelMap, err := b.ToMap(model)
