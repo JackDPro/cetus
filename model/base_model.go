@@ -3,13 +3,13 @@ package model
 import (
 	"encoding/json"
 	"fmt"
-	"gorm.io/gorm"
 	"reflect"
 	"strings"
+
+	"gorm.io/gorm"
 )
 
 type BaseModel struct {
-	gorm.Model
 }
 
 func (b *BaseModel) ToJson(model interface{}) (string, error) {
