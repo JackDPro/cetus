@@ -587,6 +587,10 @@ func (u *User) ToMap() (map[string]interface{}, error) {
 | `SERVER_HTTP_PORT` | HTTP 服务端口 | `80` |
 | `SERVER_GRPC_PORT` | gRPC 服务端口 | `50051` |
 
+## 示例项目
+
+查看 [cetus-demo](https://github.com/JackDPro/cetus-demo)，一个包含用户注册、JWT 认证和 CRUD 操作的完整示例。
+
 ## 开源许可
 
 MIT

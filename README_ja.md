@@ -587,6 +587,10 @@ func (u *User) ToMap() (map[string]interface{}, error) {
 | `SERVER_HTTP_PORT` | HTTP サーバーポート | `80` |
 | `SERVER_GRPC_PORT` | gRPC サーバーポート | `50051` |
 
+## デモプロジェクト
+
+ユーザー登録、JWT 認証、CRUD 操作を含む完全な実装例は [cetus-demo](https://github.com/JackDPro/cetus-demo) をご覧ください。
+
 ## ライセンス
 
 MIT
