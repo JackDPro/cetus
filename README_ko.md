@@ -203,6 +203,22 @@ decoded := provider.Hash().Decode(1580030173) // 42
 
 `.env`에 `OPTIMUS_PRIME`, `OPTIMUS_INVERSE`, `OPTIMUS_RANDOM` 설정이 필요합니다.
 
+**값 얻는 방법:**
+
+1. http://primes.utm.edu/lists/small/millions/ 에 접속하여 아무 `.txt` 파일을 다운로드하고, `2,147,483,647` 미만의 소수를 **하나 임의로 선택**합니다. 이것이 `OPTIMUS_PRIME`이 됩니다.
+2. [cetus-demo](https://github.com/JackDPro/cetus-demo)의 생성 도구로 나머지 두 값을 계산합니다:
+
+```bash
+go run storage/optimus_gen.go 104393867
+
+# 출력:
+# OPTIMUS_PRIME=104393867
+# OPTIMUS_INVERSE=1990279033
+# OPTIMUS_RANDOM=1333095938
+```
+
+> **중요:** 프로덕션 배포 후 이 값을 변경하지 마세요. 기존의 모든 인코딩된 ID가 무효화됩니다.
+
 #### RSA 암호화
 
 ```go
@@ -387,9 +403,22 @@ JWT_ISSUE=example.com
 ```
 
 **RSA 키 생성:**
+
+개인 키는 **PKCS#8 DER** 형식, 공개 키는 **PEM** 형식이어야 합니다:
+
 ```bash
-openssl genpkey -algorithm RSA -out storage/jwt.key -pkeyopt rsa_keygen_bits:2048
-openssl rsa -in storage/jwt.key -pubout -out storage/jwt.crt
+# 1. RSA 개인 키 생성 (PKCS#1 PEM 형식)
+openssl genrsa -out jwt1.pem 2048
+
+# 2. PKCS#8 DER 형식으로 변환 (cetus 필수 형식)
+openssl pkcs8 -topk8 -inform PEM -outform DER \
+  -in jwt1.pem -out storage/jwt.key -nocrypt
+
+# 3. 공개 키 추출 (PEM 형식)
+openssl rsa -in jwt1.pem -pubout -out storage/jwt.crt
+
+# 4. 임시 파일 삭제
+rm jwt1.pem
 ```
 
 **사용법:**

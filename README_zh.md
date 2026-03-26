@@ -203,6 +203,22 @@ decoded := provider.Hash().Decode(1580030173) // 42
 
 需要在 `.env` 中配置 `OPTIMUS_PRIME`、`OPTIMUS_INVERSE`、`OPTIMUS_RANDOM`。
 
+**获取方式：**
+
+1. 访问 http://primes.utm.edu/lists/small/millions/，下载任意一个 `.txt` 文件，打开后**随机选取一个**小于 `2,147,483,647` 的质数，作为 `OPTIMUS_PRIME`。
+2. 使用 [cetus-demo](https://github.com/JackDPro/cetus-demo) 中的工具计算另外两个值：
+
+```bash
+go run storage/optimus_gen.go 104393867
+
+# 输出：
+# OPTIMUS_PRIME=104393867
+# OPTIMUS_INVERSE=1990279033
+# OPTIMUS_RANDOM=1333095938
+```
+
+> **重要提示：** 一旦部署到生产环境，切勿更改这些值——否则所有已编码的 ID 将失效。
+
 #### RSA 加密
 
 ```go
@@ -387,9 +403,22 @@ JWT_ISSUE=example.com
 ```
 
 **生成 RSA 密钥：**
+
+私钥必须为 **PKCS#8 DER** 格式，公钥为 **PEM** 格式：
+
 ```bash
-openssl genpkey -algorithm RSA -out storage/jwt.key -pkeyopt rsa_keygen_bits:2048
-openssl rsa -in storage/jwt.key -pubout -out storage/jwt.crt
+# 1. 生成 RSA 私钥（PKCS#1 PEM 格式）
+openssl genrsa -out jwt1.pem 2048
+
+# 2. 转换为 PKCS#8 DER 格式（cetus 要求的格式）
+openssl pkcs8 -topk8 -inform PEM -outform DER \
+  -in jwt1.pem -out storage/jwt.key -nocrypt
+
+# 3. 导出公钥（PEM 格式）
+openssl rsa -in jwt1.pem -pubout -out storage/jwt.crt
+
+# 4. 清理临时文件
+rm jwt1.pem
 ```
 
 **使用方式：**

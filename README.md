@@ -203,6 +203,22 @@ decoded := provider.Hash().Decode(1580030173) // 42
 
 Requires `OPTIMUS_PRIME`, `OPTIMUS_INVERSE`, `OPTIMUS_RANDOM` in `.env`.
 
+**How to get these values:**
+
+1. Visit http://primes.utm.edu/lists/small/millions/, download any `.txt` file, open it and **randomly pick a prime number** less than `2,147,483,647` — this will be your `OPTIMUS_PRIME`.
+2. Use the generator in [cetus-demo](https://github.com/JackDPro/cetus-demo) to calculate the other two values:
+
+```bash
+go run storage/optimus_gen.go 104393867
+
+# Output:
+# OPTIMUS_PRIME=104393867
+# OPTIMUS_INVERSE=1990279033
+# OPTIMUS_RANDOM=1333095938
+```
+
+> **Important:** Once deployed to production, never change these values — all existing encoded IDs will become invalid.
+
 #### RSA Cryptography
 
 ```go
@@ -387,9 +403,22 @@ JWT_ISSUE=example.com
 ```
 
 **Generate RSA keys:**
+
+The private key must be in **PKCS#8 DER** format, the public key in **PEM** format:
+
 ```bash
-openssl genpkey -algorithm RSA -out storage/jwt.key -pkeyopt rsa_keygen_bits:2048
-openssl rsa -in storage/jwt.key -pubout -out storage/jwt.crt
+# 1. Generate RSA private key (PKCS#1 PEM)
+openssl genrsa -out jwt1.pem 2048
+
+# 2. Convert to PKCS#8 DER format (required by cetus)
+openssl pkcs8 -topk8 -inform PEM -outform DER \
+  -in jwt1.pem -out storage/jwt.key -nocrypt
+
+# 3. Extract public key (PEM)
+openssl rsa -in jwt1.pem -pubout -out storage/jwt.crt
+
+# 4. Clean up
+rm jwt1.pem
 ```
 
 **Usage:**

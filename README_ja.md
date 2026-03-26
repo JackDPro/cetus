@@ -203,6 +203,22 @@ decoded := provider.Hash().Decode(1580030173) // 42
 
 `.env` に `OPTIMUS_PRIME`、`OPTIMUS_INVERSE`、`OPTIMUS_RANDOM` の設定が必要です。
 
+**取得方法：**
+
+1. http://primes.utm.edu/lists/small/millions/ にアクセスし、任意の `.txt` ファイルをダウンロードして開き、`2,147,483,647` 未満の素数を**ランダムに1つ選びます**。これが `OPTIMUS_PRIME` になります。
+2. [cetus-demo](https://github.com/JackDPro/cetus-demo) のジェネレーターで残りの2つの値を計算します：
+
+```bash
+go run storage/optimus_gen.go 104393867
+
+# 出力：
+# OPTIMUS_PRIME=104393867
+# OPTIMUS_INVERSE=1990279033
+# OPTIMUS_RANDOM=1333095938
+```
+
+> **重要：** 本番環境にデプロイ後、これらの値を変更しないでください。既存のエンコード済み ID がすべて無効になります。
+
 #### RSA 暗号
 
 ```go
@@ -387,9 +403,22 @@ JWT_ISSUE=example.com
 ```
 
 **RSA 鍵の生成：**
+
+秘密鍵は **PKCS#8 DER** 形式、公開鍵は **PEM** 形式である必要があります：
+
 ```bash
-openssl genpkey -algorithm RSA -out storage/jwt.key -pkeyopt rsa_keygen_bits:2048
-openssl rsa -in storage/jwt.key -pubout -out storage/jwt.crt
+# 1. RSA 秘密鍵を生成（PKCS#1 PEM 形式）
+openssl genrsa -out jwt1.pem 2048
+
+# 2. PKCS#8 DER 形式に変換（cetus が要求する形式）
+openssl pkcs8 -topk8 -inform PEM -outform DER \
+  -in jwt1.pem -out storage/jwt.key -nocrypt
+
+# 3. 公開鍵をエクスポート（PEM 形式）
+openssl rsa -in jwt1.pem -pubout -out storage/jwt.crt
+
+# 4. 一時ファイルを削除
+rm jwt1.pem
 ```
 
 **使い方：**
