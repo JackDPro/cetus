@@ -4,6 +4,8 @@
 
 [Gin](https://github.com/gin-gonic/gin) ベースの Go HTTP サービス開発ツールキット。設定管理、データベースアクセス（MySQL/PostgreSQL）、JWT 認証、構造化ログ、ミドルウェア、標準化された API レスポンスをすぐに利用できます。
 
+> **実際の動作例をお探しですか？** [cetus-demo](https://github.com/JackDPro/cetus-demo) をご覧ください。ユーザー登録、JWT 認証、CRUD 操作を含む完全な REST API をステップバイステップで構築します。
+
 ## 機能
 
 - **設定管理** - `.env` ファイルによる環境変数ベースの設定、シングルトンパターン

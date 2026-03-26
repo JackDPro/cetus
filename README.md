@@ -4,6 +4,8 @@
 
 A Go toolkit for building HTTP services with [Gin](https://github.com/gin-gonic/gin). Provides configuration management, database access (MySQL/PostgreSQL), JWT authentication, structured logging, middleware, and standardized API responses out of the box.
 
+> **Looking for a working example?** Check out [cetus-demo](https://github.com/JackDPro/cetus-demo) — a complete REST API with user registration, JWT auth, and CRUD, built step by step.
+
 ## Features
 
 - **Configuration** - Environment-based config with `.env` files, singleton pattern
