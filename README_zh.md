@@ -205,7 +205,7 @@ decoded := provider.Hash().Decode(1580030173) // 42
 
 **获取方式：**
 
-1. 访问 http://primes.utm.edu/lists/small/millions/，下载任意一个 `.txt` 文件，打开后**随机选取一个**小于 `2,147,483,647` 的质数，作为 `OPTIMUS_PRIME`。
+1. 访问 http://primes.utm.edu/lists/small/millions/  下载任意一个 `.txt` 文件，打开后**随机选取一个**小于 `2,147,483,647` 的质数，作为 `OPTIMUS_PRIME`。
 2. 使用 [cetus-demo](https://github.com/JackDPro/cetus-demo) 中的工具计算另外两个值：
 
 ```bash
