@@ -8,7 +8,7 @@ import (
 type ValidToken struct {
 	gorm.Model
 	Id        string    `json:"id"`
-	UserId    uint64    `json:"user_id"`
+	UserId    string    `json:"user_id"`
 	Token     string    `json:"token"`
 	Type      string    `json:"type"`
 	Audience  string    `json:"audience"`

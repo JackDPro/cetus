@@ -71,7 +71,7 @@ func GetJwtGuard() (*Guard, error) {
 	return guardInstance, nil
 }
 
-func (guard *Guard) CreateAccessToken(userId uint64) (*AccessToken, error) {
+func (guard *Guard) CreateAccessToken(userId string) (*AccessToken, error) {
 	ctx := context.Background()
 	var conf = config.GetAuthConf()
 	now := time.Now()
@@ -85,7 +85,7 @@ func (guard *Guard) CreateAccessToken(userId uint64) (*AccessToken, error) {
 		Now:       now,
 		Audience:  conf.Audience,
 	}
-	tokenKey := fmt.Sprintf("%s:%d:%s", conf.RedisPrefix, userId, tokenJti.Id)
+	tokenKey := fmt.Sprintf("%s:%s:%s", conf.RedisPrefix, userId, tokenJti.Id)
 	jsonStr, err := json.Marshal(tokenJti.ToJsonMap())
 	if err != nil {
 		return nil, err
@@ -117,7 +117,7 @@ func (guard *Guard) CreateAccessToken(userId uint64) (*AccessToken, error) {
 	return accessToken, nil
 }
 
-func (guard *Guard) CreateToken(userId uint64, clean bool) (*AccessToken, error) {
+func (guard *Guard) CreateToken(userId string, clean bool) (*AccessToken, error) {
 	ctx := context.Background()
 	var conf = config.GetAuthConf()
 	now := time.Now()
@@ -131,7 +131,7 @@ func (guard *Guard) CreateToken(userId uint64, clean bool) (*AccessToken, error)
 		Now:       now,
 		Audience:  conf.Audience,
 	}
-	tokenKey := fmt.Sprintf("%s:%d:%s", conf.RedisPrefix, userId, tokenJti.Id)
+	tokenKey := fmt.Sprintf("%s:%s:%s", conf.RedisPrefix, userId, tokenJti.Id)
 	jsonStr, err := json.Marshal(tokenJti.ToJsonMap())
 	if err != nil {
 		return nil, err
@@ -166,7 +166,7 @@ func (guard *Guard) CreateToken(userId uint64, clean bool) (*AccessToken, error)
 		Now:       now,
 		Audience:  conf.Audience,
 	}
-	refreshKey := fmt.Sprintf("%s:%d:%s", conf.RedisPrefix, userId, refreshJti.Id)
+	refreshKey := fmt.Sprintf("%s:%s:%s", conf.RedisPrefix, userId, refreshJti.Id)
 	refresh := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"iss": conf.Issue,                  //issuer 谁创建的颁发的 token
 		"aud": refreshJti.Audience,         //audience 颁发给谁的
@@ -222,7 +222,7 @@ func (guard *Guard) DeleteCredential(credential string) error {
 		return err
 	}
 	ctx := context.Background()
-	_, err = guard.redis.Del(ctx, fmt.Sprintf("%s:%d:%s", conf.RedisPrefix, token.UserId, token.Id)).Result()
+	_, err = guard.redis.Del(ctx, fmt.Sprintf("%s:%s:%s", conf.RedisPrefix, token.UserId, token.Id)).Result()
 	if err != nil {
 		return err
 	}
@@ -247,14 +247,14 @@ func (guard *Guard) Attempt(credentials string) (*ValidToken, error) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		// 验证 jti
 		jti := claims["jti"]
-		uid, ok := claims["uid"].(float64)
+		uid, ok := claims["uid"].(string)
 		tokenId := claims["tid"]
 		tokenType := claims["typ"]
 		if !ok {
-			return nil, errors.New("uid is not a number")
+			return nil, errors.New("uid is not a string")
 		}
-		userId := uint64(uid)
-		validTokenStr, err := guard.redis.Get(ctx, fmt.Sprintf("%s:%d:%s", conf.RedisPrefix, userId, tokenId)).Result()
+		userId := uid
+		validTokenStr, err := guard.redis.Get(ctx, fmt.Sprintf("%s:%s:%s", conf.RedisPrefix, userId, tokenId)).Result()
 		if err != nil {
 			return nil, err
 		}
