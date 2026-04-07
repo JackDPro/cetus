@@ -1,15 +1,33 @@
 package model
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
+	"github.com/oklog/ulid/v2"
 	"gorm.io/gorm"
 )
 
 type BaseModel struct {
+}
+
+func (b *BaseModel) BeforeCreate(tx *gorm.DB) error {
+	model := tx.Statement.ReflectValue
+	if model.Kind() == reflect.Ptr {
+		model = model.Elem()
+	}
+	if model.Kind() != reflect.Struct {
+		return nil
+	}
+	idField := model.FieldByName("Id")
+	if idField.IsValid() && idField.CanSet() && idField.Kind() == reflect.String && idField.String() == "" {
+		idField.SetString(ulid.MustNew(ulid.Timestamp(time.Now()), rand.Reader).String())
+	}
+	return nil
 }
 
 func (b *BaseModel) ToJson(model interface{}) (string, error) {

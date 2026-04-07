@@ -10,6 +10,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
+	github.com/oklog/ulid/v2 v2.1.1
 	github.com/pjebs/optimus-go v1.0.0
 	github.com/redis/go-redis/v9 v9.18.0
 	go.uber.org/zap v1.27.1
