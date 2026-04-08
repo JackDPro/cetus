@@ -1,13 +1,11 @@
 package jwt
 
 import (
-	"gorm.io/gorm"
 	"time"
 )
 
 type ValidToken struct {
-	gorm.Model
-	Id        string    `json:"id"`
+	Id        string    `json:"id" gorm:"primaryKey;type:char(26)"`
 	UserId    string    `json:"user_id"`
 	Token     string    `json:"token"`
 	Type      string    `json:"type"`
