@@ -55,9 +55,18 @@ func (b *BaseModel) ToMap(model interface{}) (map[string]interface{}, error) {
 	for i := 0; i < val.NumField(); i++ {
 		field := typ.Field(i)
 		tag := field.Tag.Get("json")
-		if tag != "" {
-			modelMap[tag] = val.Field(i).Interface()
+		if tag == "" || tag == "-" {
+			continue
 		}
+		name, opts, _ := strings.Cut(tag, ",")
+		if name == "" || name == "-" {
+			continue
+		}
+		fv := val.Field(i)
+		if strings.Contains(opts, "omitempty") && fv.IsZero() {
+			continue
+		}
+		modelMap[name] = fv.Interface()
 	}
 	return modelMap, nil
 }
