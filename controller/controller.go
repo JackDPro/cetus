@@ -1,12 +1,12 @@
 package controller
 
 import (
+	"net/http"
+	"reflect"
+
 	"github.com/JackDPro/cetus/model"
 	"github.com/JackDPro/cetus/provider"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"reflect"
-	"strconv"
 )
 
 func ResponseUnauthorized(c *gin.Context) {
@@ -26,9 +26,9 @@ func ResponseAccepted(c *gin.Context) {
 func ResponseSuccess(c *gin.Context) {
 	c.JSON(http.StatusOK, &model.Success{Code: 0})
 }
-func ResponseCreated(c *gin.Context, id uint64) {
-	c.Writer.Header().Set("Location", strconv.FormatUint(id, 10))
-	c.JSON(http.StatusCreated, map[string]uint64{
+func ResponseCreated(c *gin.Context, id string) {
+	c.Writer.Header().Set("Location", id)
+	c.JSON(http.StatusCreated, map[string]string{
 		"id": id,
 	})
 }
