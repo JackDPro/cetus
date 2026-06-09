@@ -13,6 +13,16 @@ type Redis struct {
 	Port     string
 	DB       int
 	PoolSize int
+	Prefix   string
+}
+
+// Key 给 key 添加全局前缀，前缀为空时返回原 key（不带分隔符）。
+// 用于多个项目共用同一个 redis 库时做命名空间隔离。
+func (r *Redis) Key(key string) string {
+	if r.Prefix == "" {
+		return key
+	}
+	return r.Prefix + ":" + key
 }
 
 var RedisConfigInstance *Redis
@@ -41,6 +51,8 @@ func GetRedisConfig() *Redis {
 		if os.Getenv("REDIS_PASSWORD") != "" {
 			password = os.Getenv("REDIS_PASSWORD")
 		}
+		// 全局前缀，可不填写，不填写时所有 key 不带前缀
+		prefix := os.Getenv("REDIS_PREFIX")
 
 		RedisConfigInstance = &Redis{
 			Host:     host,
@@ -48,6 +60,7 @@ func GetRedisConfig() *Redis {
 			Port:     port,
 			DB:       database,
 			PoolSize: 10,
+			Prefix:   prefix,
 		}
 	})
 	return RedisConfigInstance

@@ -85,7 +85,7 @@ func (guard *Guard) CreateAccessToken(userId string) (*AccessToken, error) {
 		Now:       now,
 		Audience:  conf.Audience,
 	}
-	tokenKey := fmt.Sprintf("%s:%s:%s", conf.RedisPrefix, userId, tokenJti.Id)
+	tokenKey := config.GetRedisConfig().Key(fmt.Sprintf("%s:%s:%s", conf.RedisPrefix, userId, tokenJti.Id))
 	jsonStr, err := json.Marshal(tokenJti.ToJsonMap())
 	if err != nil {
 		return nil, err
@@ -131,7 +131,7 @@ func (guard *Guard) CreateToken(userId string, clean bool) (*AccessToken, error)
 		Now:       now,
 		Audience:  conf.Audience,
 	}
-	tokenKey := fmt.Sprintf("%s:%s:%s", conf.RedisPrefix, userId, tokenJti.Id)
+	tokenKey := config.GetRedisConfig().Key(fmt.Sprintf("%s:%s:%s", conf.RedisPrefix, userId, tokenJti.Id))
 	jsonStr, err := json.Marshal(tokenJti.ToJsonMap())
 	if err != nil {
 		return nil, err
@@ -166,7 +166,7 @@ func (guard *Guard) CreateToken(userId string, clean bool) (*AccessToken, error)
 		Now:       now,
 		Audience:  conf.Audience,
 	}
-	refreshKey := fmt.Sprintf("%s:%s:%s", conf.RedisPrefix, userId, refreshJti.Id)
+	refreshKey := config.GetRedisConfig().Key(fmt.Sprintf("%s:%s:%s", conf.RedisPrefix, userId, refreshJti.Id))
 	refresh := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"iss": conf.Issue,                  //issuer 谁创建的颁发的 token
 		"aud": refreshJti.Audience,         //audience 颁发给谁的
@@ -199,7 +199,7 @@ func (guard *Guard) CreateToken(userId string, clean bool) (*AccessToken, error)
 
 	// 清空 token
 	if clean {
-		iter := guard.redis.Scan(ctx, 0, fmt.Sprintf("%s:%d:*", conf.RedisPrefix, userId), 0).Iterator()
+		iter := guard.redis.Scan(ctx, 0, config.GetRedisConfig().Key(fmt.Sprintf("%s:%s:*", conf.RedisPrefix, userId)), 0).Iterator()
 		for iter.Next(ctx) {
 			if iter.Val() != tokenKey && iter.Val() != refreshKey {
 				err := guard.redis.Del(ctx, iter.Val()).Err()
@@ -222,7 +222,7 @@ func (guard *Guard) DeleteCredential(credential string) error {
 		return err
 	}
 	ctx := context.Background()
-	_, err = guard.redis.Del(ctx, fmt.Sprintf("%s:%s:%s", conf.RedisPrefix, token.UserId, token.Id)).Result()
+	_, err = guard.redis.Del(ctx, config.GetRedisConfig().Key(fmt.Sprintf("%s:%s:%s", conf.RedisPrefix, token.UserId, token.Id))).Result()
 	if err != nil {
 		return err
 	}
@@ -254,7 +254,7 @@ func (guard *Guard) Attempt(credentials string) (*ValidToken, error) {
 			return nil, errors.New("uid is not a string")
 		}
 		userId := uid
-		validTokenStr, err := guard.redis.Get(ctx, fmt.Sprintf("%s:%s:%s", conf.RedisPrefix, userId, tokenId)).Result()
+		validTokenStr, err := guard.redis.Get(ctx, config.GetRedisConfig().Key(fmt.Sprintf("%s:%s:%s", conf.RedisPrefix, userId, tokenId))).Result()
 		if err != nil {
 			return nil, err
 		}
