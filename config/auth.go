@@ -7,12 +7,13 @@ import (
 )
 
 type AuthConf struct {
-	CertPath    string
-	KeyPath     string
-	Issue       string
-	Audience    string
-	ExpiresIn   int
-	RedisPrefix string
+	CertPath         string
+	KeyPath          string
+	Issue            string
+	Audience         string
+	ExpiresIn        int
+	RefreshExpiresIn int
+	RedisPrefix      string
 }
 
 var authConfInstance *AuthConf
@@ -27,17 +28,25 @@ func GetAuthConf() *AuthConf {
 				expiresIn = value
 			}
 		}
+		refreshExpiresIn := expiresIn * 3
+		if os.Getenv("JWT_REFRESH_EXPIRES_IN") != "" {
+			value, err := strconv.Atoi(os.Getenv("JWT_REFRESH_EXPIRES_IN"))
+			if err == nil {
+				refreshExpiresIn = value
+			}
+		}
 		redisPrefix := "tokens"
 		if os.Getenv("JWT_REDIS_PREFIX") != "" {
 			redisPrefix = os.Getenv("JWT_REDIS_PREFIX")
 		}
 		authConfInstance = &AuthConf{
-			CertPath:    os.Getenv("JWT_CERT_PATH"),
-			KeyPath:     os.Getenv("JWT_KEY_PATH"),
-			Issue:       os.Getenv("JWT_ISSUE"),
-			Audience:    os.Getenv("JWT_AUDIENCE"),
-			RedisPrefix: redisPrefix,
-			ExpiresIn:   expiresIn,
+			CertPath:         os.Getenv("JWT_CERT_PATH"),
+			KeyPath:          os.Getenv("JWT_KEY_PATH"),
+			Issue:            os.Getenv("JWT_ISSUE"),
+			Audience:         os.Getenv("JWT_AUDIENCE"),
+			RedisPrefix:      redisPrefix,
+			ExpiresIn:        expiresIn,
+			RefreshExpiresIn: refreshExpiresIn,
 		}
 	})
 	return authConfInstance

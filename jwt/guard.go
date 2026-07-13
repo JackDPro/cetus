@@ -162,7 +162,7 @@ func (guard *Guard) CreateToken(userId string, clean bool) (*AccessToken, error)
 		UserId:    userId,
 		Token:     provider.RandomString(32),
 		Type:      "refresh",
-		ExpiredAt: now.Add(time.Duration(conf.ExpiresIn) * time.Hour),
+		ExpiredAt: now.Add(time.Duration(conf.RefreshExpiresIn) * time.Hour),
 		Now:       now,
 		Audience:  conf.Audience,
 	}
@@ -182,7 +182,7 @@ func (guard *Guard) CreateToken(userId string, clean bool) (*AccessToken, error)
 	if err != nil {
 		return nil, err
 	}
-	_, err = guard.redis.SetNX(ctx, refreshKey, refreshJsonStr, time.Duration(conf.ExpiresIn)*3*time.Hour).Result()
+	_, err = guard.redis.SetNX(ctx, refreshKey, refreshJsonStr, time.Duration(conf.RefreshExpiresIn)*time.Hour).Result()
 	if err != nil {
 		return nil, err
 	}
@@ -213,6 +213,26 @@ func (guard *Guard) CreateToken(userId string, clean bool) (*AccessToken, error)
 		}
 	}
 	return accessToken, nil
+}
+
+// RotateRefreshToken atomically consumes a refresh token and issues a new
+// access/refresh pair. Exactly one concurrent use of a refresh token can win.
+func (guard *Guard) RotateRefreshToken(refreshToken string) (*AccessToken, error) {
+	validToken, err := guard.Attempt(refreshToken)
+	if err != nil {
+		return nil, err
+	}
+	if validToken.Type != "refresh" {
+		return nil, errors.New("credential is not a refresh token")
+	}
+
+	conf := config.GetAuthConf()
+	key := config.GetRedisConfig().Key(fmt.Sprintf("%s:%s:%s", conf.RedisPrefix, validToken.UserId, validToken.Id))
+	if _, err = guard.redis.GetDel(context.Background(), key).Result(); err != nil {
+		return nil, err
+	}
+
+	return guard.CreateToken(validToken.UserId, false)
 }
 
 func (guard *Guard) DeleteCredential(credential string) error {
